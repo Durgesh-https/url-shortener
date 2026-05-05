@@ -144,9 +144,9 @@ GET /r/:shortId
 
 ## ⚙️ Environment Variables (.env)
 
-MONGO_URI=your_mongodb_connection_string
-BASE_URL=http://localhost:5000
-PORT=5000
+-MONGO_URI=your_mongodb_connection_string
+-BASE_URL=http://localhost:url_base
+-PORT=your_port
 
 ---
 
