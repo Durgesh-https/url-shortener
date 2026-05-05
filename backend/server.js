@@ -31,7 +31,7 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-/* ---------------- CORS (PRODUCTION FIXED) ---------------- */
+/* ---------------- CORS (PRODUCTION SAFE) ---------------- */
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -42,7 +42,7 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow server-to-server or Postman requests
+      // Allow requests like Postman / server-to-server
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -51,17 +51,23 @@ app.use(
 
       console.log("❌ Blocked by CORS:", origin);
 
-      // IMPORTANT: still allow request but do not break preflight
+      // DO NOT throw error (prevents Render crash)
       return callback(null, true);
     },
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
-    credentials: false,
   }),
 );
 
-/* ---------------- PRE-FLIGHT HANDLING ---------------- */
-app.options("*", cors());
+/* ---------------- FIX PRE-FLIGHT (IMPORTANT) ---------------- */
+
+// SAFE alternative to app.options("*")
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 /* ---------------- ROUTES ---------------- */
 
